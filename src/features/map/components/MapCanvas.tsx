@@ -4,7 +4,9 @@ import Konva from 'konva'; // Importuj Konva dla typów
 import { KonvaEventObject } from 'konva/lib/Node'; // Typ dla eventów Konva
 import useImage from 'use-image';
 import { useMapState, useMapDispatch } from '../contexts/MapStateContext';
-import { MapElement, OperatorElement, AdminMapConfig, CalloutConfig, Tool } from '../types'; // Importuj typy
+import { MapElement, OperatorElement, AdminMapConfig, CalloutConfig, MapIconConfig, Tool, LegendIconElement, LegendIconElementBase, LegendIconElementSymbol, LegendIconElementSVG } from '../types'; // Importuj typy
+import { useTranslation } from 'react-i18next';
+import { legendItems } from '../config/legendConfig';
 
 // Definicja typów propsów dla MapCanvas
 interface MapCanvasProps {
@@ -16,25 +18,29 @@ interface MapCanvasProps {
 const svgStringToImage = (svgString: string | undefined | null, width: number, height: number): Promise<HTMLImageElement> => {
   return new Promise((resolve, reject) => {
       // --- Early validation ---
-      if (typeof svgString !== 'string' || svgString.trim() === '') {
+      if (!svgString) {
           console.error("svgStringToImage called with invalid or empty svgString input.");
-          // Reject with a specific error message
           reject(new Error('Invalid or empty SVG string provided'));
-          return; // Stop execution
+          return;
       }
       // --- End validation ---
 
-
-      // 1. Create a data URL from the SVG string
-      // Encode potentially problematic characters like #
-      const encodedSVG = encodeURIComponent(svgString)
-                          .replace(/'/g, '%27')
-                          .replace(/"/g, '%22');
-      const dataUrl = `data:image/svg+xml;charset=utf-8,${encodedSVG}`;
+      // 1. Create a data URL from the SVG string or use the URL directly
+      let dataUrl: string;
+      if (svgString.startsWith('data:image/svg+xml') || svgString.startsWith('http')) {
+          // If it's already a data URL or http URL, use it directly
+          dataUrl = svgString;
+      } else {
+          // Encode potentially problematic characters like #
+          const encodedSVG = encodeURIComponent(svgString)
+                              .replace(/'/g, '%27')
+                              .replace(/"/g, '%22');
+          dataUrl = `data:image/svg+xml;charset=utf-8,${encodedSVG}`;
+      }
 
       // 2. Create an HTML Image element
       const img = new Image();
-      img.crossOrigin = 'anonymous'; // Might be needed depending on SVG content/server
+      img.crossOrigin = 'anonymous';
 
       img.onload = () => {
           // Check if dimensions are valid
@@ -46,25 +52,21 @@ const svgStringToImage = (svgString: string | undefined | null, width: number, h
                     if (img.naturalWidth > 0 && img.naturalHeight > 0) {
                         resolve(img);
                     } else {
-                       // Use the validated svgString here for logging if needed
-                       console.error("SVG loaded but has zero dimensions:", typeof svgString === 'string' ? svgString.substring(0, 100) : "[Original SVG Input Invalid]");
+                       console.error("SVG loaded but has zero dimensions:", svgString.substring(0, 100));
                        reject(new Error('SVG failed to load with valid dimensions'));
                     }
-                }, 50); // 50ms delay fallback
+                }, 50);
            }
       };
 
       img.onerror = (error) => {
-          // --- Add check here ---
-          const svgSnippet = typeof svgString === 'string' ? svgString.substring(0, 100) : "[Original SVG Input Invalid]";
-          console.error("Error loading SVG data URL:", error, svgSnippet);
-          // --- End check ---
+          console.error("Error loading SVG:", error, svgString.substring(0, 100));
           reject(error);
       };
 
       // 3. Set the source to the data URL
       img.src = dataUrl;
-      // Optional: Explicitly set dimensions (might help some browsers)
+      // Optional: Explicitly set dimensions
       img.width = width;
       img.height = height;
   });
@@ -144,6 +146,98 @@ const OperatorIcon: React.FC<{ element: OperatorElement, commonProps: ComponentP
           />;
 };
 
+const LegendIcon: React.FC<{ element: LegendIconElement }> = ({ element }) => {
+  const [imageElement, setImageElement] = useState<HTMLImageElement | null>(null);
+  const [error, setError] = useState<boolean>(false);
+  const isMountedRef = useRef(true);
+
+  useEffect(() => {
+      isMountedRef.current = true;
+      let active = true;
+
+      setImageElement(null);
+      setError(false);
+
+      if (element.svgSource) {
+          svgStringToImage(element.svgSource, element.width, element.height)
+              .then(img => {
+                  if (isMountedRef.current && active) {
+                      setImageElement(img);
+                  }
+              })
+              .catch(err => {
+                  if (isMountedRef.current && active) {
+                      console.error(`Failed to render SVG for legend icon ${element.legendId}:`, err);
+                      setError(true);
+                  }
+              });
+      }
+
+      return () => {
+          isMountedRef.current = false;
+          active = false;
+      };
+  }, [element.svgSource, element.legendId, element.width, element.height]);
+
+  const commonProps = {
+      x: element.x,
+      y: element.y,
+      width: element.width,
+      height: element.height,
+      scaleX: 1,
+      scaleY: 1,
+      align: "center" as const,
+      verticalAlign: "middle" as const,
+  };
+
+  if (error) {
+      return <Circle 
+                radius={element.width / 2} 
+                fill="red" 
+                x={element.x}
+                y={element.y}
+              />;
+  }
+
+  // Jeśli mamy SVG i jest załadowany, renderuj jako obraz
+  if (element.svgSource && imageElement) {
+      return <KonvaImage
+                {...commonProps}
+                image={imageElement}
+                offsetX={element.width/2}
+                offsetY={element.height/2}
+            />;
+  }
+
+  // Jeśli mamy SVG ale nie jest jeszcze załadowany, pokaż szare kółko
+  if (element.svgSource && !imageElement) {
+      return <Circle 
+                radius={element.width / 2} 
+                fill="gray" 
+                x={element.x}
+                y={element.y}
+              />;
+  }
+
+  // Jeśli mamy symbol, renderuj jako tekst
+  if (element.symbol) {
+      return <KonvaText
+                {...commonProps}
+                text={element.symbol}
+                fill={element.color}
+                fontSize={element.height * 0.8}
+            />;
+  }
+
+  // Jeśli nie mamy ani SVG ani symbolu, pokaż czerwone kółko
+  return <Circle 
+            radius={element.width / 2} 
+            fill="red" 
+            x={element.x}
+            y={element.y}
+          />;
+};
+
 const MapCanvas: React.FC<MapCanvasProps> = ({ mapImageUrl, currentFloor, adminConfig }) => {
   // Typowanie refów
   const stageRef = useRef<Konva.Stage>(null);
@@ -163,6 +257,8 @@ const MapCanvas: React.FC<MapCanvasProps> = ({ mapImageUrl, currentFloor, adminC
   // Typowanie stanu dla punktów rysowania
   const [drawingPoints, setDrawingPoints] = useState<number[]>([]);
   const [canvasSize, setCanvasSize] = useState<{ width: number; height: number }>({ width: 500, height: 500 }); // Domyślny rozmiar
+  const [mousePosition, setMousePosition] = useState<{ x: number; y: number } | null>(null);
+  const { t } = useTranslation();
 
   // Efekt do ustawiania rozmiaru canvasa
   useEffect(() => {
@@ -368,32 +464,61 @@ const MapCanvas: React.FC<MapCanvasProps> = ({ mapImageUrl, currentFloor, adminC
          case 'select':
              // Nic nie rób na mousedown na stage
             break;
+        case 'legendIcon':
+            if (mapState.selectedLegendItem) {
+                // Ustawiamy stałe rozmiary ikony
+                const iconSize = 30; // Stały rozmiar niezależny od skali
+                // Dodajemy element ikony z dokładną pozycją kursora
+                dispatch({ 
+                    type: 'ADD_ELEMENT', 
+                    payload: { 
+                        floor: currentFloor,
+                        element: { 
+                            id: 0, 
+                            type: 'legendIcon', 
+                            x: pos.x, 
+                            y: pos.y, 
+                            legendId: mapState.selectedLegendItem.id,
+                            color: mapState.selectedLegendItem.color,
+                            width: iconSize,
+                            height: iconSize,
+                            ...(mapState.selectedLegendItem.svgSource ? 
+                                { svgSource: mapState.selectedLegendItem.svgSource } : 
+                                { symbol: mapState.selectedLegendItem.symbol })
+                        } 
+                    }
+                });
+            }
+            break;
      }
-  }, [currentTool, dispatch, getRelativePointerPosition, selectedColor, selectedOperator, currentFloor]);
+  }, [currentTool, dispatch, getRelativePointerPosition, selectedColor, selectedOperator, currentFloor, mapState.selectedLegendItem]);
 
   const handleMouseMove = useCallback(() => {
-    if (!isDrawing) return;
-
     const stage = stageRef.current;
     const pos = getRelativePointerPosition(stage);
     if (!pos) return;
 
-    switch (currentTool) {
-       case 'draw':
-       case 'erase': // Gumka działa jak rysowanie specjalną linią
-           setDrawingPoints(prev => [...prev, pos.x, pos.y]);
-           // Rysuj linię podglądu w previewLayerRef
-           break;
-        case 'arrow':
-            // Aktualizuj tylko ostatnie dwa punkty (końcówkę strzałki)
-            setDrawingPoints(prev => [prev[0], prev[1], pos.x, pos.y]);
-             // Rysuj podgląd strzałki w previewLayerRef
-            break;
-        // Inne narzędzia mogą nie potrzebować obsługi w mouseMove
-    }
-     // Wymuś odświeżenie warstwy podglądu
-     previewLayerRef.current?.batchDraw();
+    // Aktualizuj współrzędne myszy
+    setMousePosition(pos);
 
+    // Obsługa rysowania
+    if (isDrawing) {
+      switch (currentTool) {
+        case 'draw':
+        case 'erase': // Gumka działa jak rysowanie specjalną linią
+          setDrawingPoints(prev => [...prev, pos.x, pos.y]);
+          // Rysuj linię podglądu w previewLayerRef
+          break;
+        case 'arrow':
+          // Aktualizuj tylko ostatnie dwa punkty (końcówkę strzałki)
+          setDrawingPoints(prev => [prev[0], prev[1], pos.x, pos.y]);
+          // Rysuj podgląd strzałki w previewLayerRef
+          break;
+        // Inne narzędzia mogą nie potrzebować obsługi w mouseMove
+      }
+      // Wymuś odświeżenie warstwy podglądu
+      previewLayerRef.current?.batchDraw();
+    }
   }, [isDrawing, currentTool, getRelativePointerPosition]);
 
   const handleMouseUp = useCallback(() => {
@@ -617,6 +742,11 @@ const MapCanvas: React.FC<MapCanvasProps> = ({ mapImageUrl, currentFloor, adminC
                       lineJoin={el.lineJoin ?? "round"}
                       globalCompositeOperation={el.globalCompositeOperation as GlobalCompositeOperation}
                    />;
+        case 'legendIcon':
+            return <LegendIcon
+                key={elementIdStr}
+                element={el as LegendIconElement}
+            />;
         default:
              console.warn("Unknown element type:", el);
           return null;
@@ -667,28 +797,100 @@ const MapCanvas: React.FC<MapCanvasProps> = ({ mapImageUrl, currentFloor, adminC
 
    // Renderowanie nakładek admina (Calloutów)
    const renderAdminOverlays = useCallback(() => {
-        if (!adminConfig?.floors || adminConfig.floors.length === 0 || adminConfig.floors[currentFloor].callouts === undefined) {
+        if (!adminConfig?.floors || adminConfig.floors.length === 0) {
             return null;
         }
-        // TODO: Zintegrować t() z react-i18next tutaj, jeśli to możliwe
-        // Może wymagać przekazania t jako prop lub użycia hooka w komponencie wyższego rzędu
-        return adminConfig.floors[currentFloor].callouts.map((callout: CalloutConfig, index: number) => (
-             <KonvaText
-                key={`callout-${index}-${callout.nameKey}`} // Lepszy klucz
-                x={callout.x}
-                y={callout.y}
-                text={callout.nameKey} // Na razie wyświetlamy klucz
-                fontSize={12 * (1 / stageState.scale)} // Skalowanie tekstu
-                fill="rgba(255, 255, 255, 0.8)"
-                listening={false}
-                scaleX={1 / stageState.scale} // Zastosuj skalowanie, aby tekst pozostał tej samej wielkości
-                scaleY={1 / stageState.scale}
-                shadowColor="black"
-                shadowBlur={2}
-                shadowOpacity={0.7}
-             />
-        ));
-   }, [adminConfig, currentFloor, stageState.scale]);
+
+        const currentFloorConfig = adminConfig.floors[currentFloor];
+        if (!currentFloorConfig) return null;
+
+        return (
+            <>
+                {/* Renderowanie calloutów */}
+                {currentFloorConfig.callouts?.map((callout: CalloutConfig, index: number) => {
+                    const text = t(`mapCallouts.${mapState.mapId}.${callout.nameKey}`);
+                    const fontSize = 16 / stageState.scale;
+                    const padding = 8 / stageState.scale;
+                    
+                    return (
+                        <React.Fragment key={`callout-${index}-${callout.nameKey}`}>
+                            {/* Tło */}
+                            <KonvaText
+                                x={callout.x}
+                                y={callout.y}
+                                text={text}
+                                fontSize={fontSize}
+                                fill="transparent"
+                                listening={false}
+                                padding={padding}
+                                background="rgba(0, 0, 0, 0.7)"
+                                cornerRadius={4 / stageState.scale}
+                                align="center"
+                                verticalAlign="middle"
+                            />
+                            {/* Tekst */}
+                            <KonvaText
+                                x={callout.x}
+                                y={callout.y}
+                                text={text}
+                                fontSize={fontSize}
+                                fill="rgba(255, 255, 255, 0.9)"
+                                listening={false}
+                                padding={padding}
+                                align="center"
+                                verticalAlign="middle"
+                            />
+                        </React.Fragment>
+                    );
+                })}
+
+                {/* Renderowanie ikon */}
+                {currentFloorConfig.icons?.map((icon: MapIconConfig, index: number) => {
+                    const legendItem = legendItems.find(item => item.id === icon.legendId);
+                    if (!legendItem) return null;
+
+                    const baseElement = {
+                        id: 0,
+                        type: 'legendIcon' as const,
+                        x: icon.x,
+                        y: icon.y,
+                        legendId: icon.legendId,
+                        color: legendItem.color,
+                        width: 30,
+                        height: 30,
+                    };
+
+                    let element: unknown;
+                    if ('svgSource' in legendItem && legendItem.svgSource) {
+                        element = {
+                            ...baseElement,
+                            svgSource: legendItem.svgSource,
+                            symbol: undefined
+                        };
+                    } else if ('symbol' in legendItem && legendItem.symbol) {
+                        element = {
+                            ...baseElement,
+                            symbol: legendItem.symbol,
+                            svgSource: undefined
+                        };
+                    } else {
+                        element = {
+                            ...baseElement,
+                            symbol: '?',
+                            svgSource: undefined
+                        };
+                    }
+
+                    return (
+                        <LegendIcon
+                            key={`icon-${index}-${icon.legendId}`}
+                            element={element as LegendIconElement}
+                        />
+                    );
+                })}
+            </>
+        );
+   }, [adminConfig, currentFloor, stageState.scale, t, mapState.mapId, legendItems]);
 
    // Ustawienie kursora myszy w zależności od narzędzia
    const getCursorStyle = (): string => {
@@ -708,60 +910,68 @@ const MapCanvas: React.FC<MapCanvasProps> = ({ mapImageUrl, currentFloor, adminC
 
 
   return (
-    <Stage
-      ref={stageRef}
-      width={canvasSize.width}
-      height={canvasSize.height}
-      draggable={currentTool === 'select'}
-      onWheel={handleWheel}
-      onMouseDown={handleMouseDown}
-      onMouseMove={handleMouseMove}
-      onMouseUp={handleMouseUp}
-      onMouseLeave={handleMouseUp}
-      onDragStart={(e) => { // Zmień kursor na 'grabbing' podczas przeciągania sceny
-          if (e.target === stageRef.current) {
-                const container = stageRef.current?.container();
-                if (container) container.style.cursor = 'grabbing';
-          }
-      }}
-      onDragEnd={(e) => { // Przywróć kursor po przeciąganiu sceny
-           handleDragEnd(e); // Wywołaj oryginalny handler
-           const container = stageRef.current?.container();
-           if (container) container.style.cursor = getCursorStyle(); // Ustaw z powrotem na podstawie narzędzia
-      }}
-      scaleX={stageState.scale}
-      scaleY={stageState.scale}
-      x={stageState.x}
-      y={stageState.y}
-      style={{ cursor: getCursorStyle() }} // Ustaw styl kursora dla kontenera stage
-    >
-      {/* Warstwa Tła Mapy */}
-      <Layer listening={false}>
-        {mapImage && (
-          <KonvaImage
-            image={mapImage}
-            width={mapImage.width}
-            height={mapImage.height}
-          />
-        )}
-      </Layer>
+    <div className="relative w-full h-full">
+      <Stage
+        ref={stageRef}
+        width={canvasSize.width}
+        height={canvasSize.height}
+        draggable={currentTool === 'select'}
+        onWheel={handleWheel}
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseUp}
+        onDragStart={(e) => { // Zmień kursor na 'grabbing' podczas przeciągania sceny
+            if (e.target === stageRef.current) {
+                  const container = stageRef.current?.container();
+                  if (container) container.style.cursor = 'grabbing';
+            }
+        }}
+        onDragEnd={(e) => { // Przywróć kursor po przeciąganiu sceny
+             handleDragEnd(e); // Wywołaj oryginalny handler
+             const container = stageRef.current?.container();
+             if (container) container.style.cursor = getCursorStyle(); // Ustaw z powrotem na podstawie narzędzia
+        }}
+        scaleX={stageState.scale}
+        scaleY={stageState.scale}
+        x={stageState.x}
+        y={stageState.y}
+        style={{ cursor: getCursorStyle() }} // Ustaw styl kursora dla kontenera stage
+      >
+        {/* Warstwa Tła Mapy */}
+        <Layer listening={false}>
+          {mapImage && (
+            <KonvaImage
+              image={mapImage}
+              width={mapImage.width}
+              height={mapImage.height}
+            />
+          )}
+        </Layer>
 
-      {/* Warstwa Nakładek Admina */}
-      <Layer listening={false}>
-         {renderAdminOverlays()}
-      </Layer>
+        {/* Warstwa Nakładek Admina */}
+        <Layer listening={false}>
+           {renderAdminOverlays()}
+        </Layer>
 
-      {/* Warstwa Rysowania Użytkownika */}
-      <Layer ref={drawLayerRef}>
-        {renderElements()}
-      </Layer>
+        {/* Warstwa Rysowania Użytkownika */}
+        <Layer ref={drawLayerRef}>
+          {renderElements()}
+        </Layer>
 
-      {/* Warstwa Podglądu Rysowania */}
-       <Layer ref={previewLayerRef} listening={false}>
-           {renderPreviewElements()}
-       </Layer>
+        {/* Warstwa Podglądu Rysowania */}
+         <Layer ref={previewLayerRef} listening={false}>
+             {renderPreviewElements()}
+         </Layer>
+      </Stage>
 
-    </Stage>
+      {/* Wyświetlanie współrzędnych myszy */}
+      {mousePosition && (
+        <div className="absolute bottom-4 left-4 z-10 bg-gray-800 bg-opacity-90 p-2 rounded-lg text-white text-sm shadow-lg">
+          X: {Math.round(mousePosition.x)}, Y: {Math.round(mousePosition.y)}
+        </div>
+      )}
+    </div>
   );
 }
 

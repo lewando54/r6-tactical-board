@@ -1,5 +1,6 @@
-import { MapConfig, OperatorConfig, LegendItemConfig, AdminMapConfig } from '../features/map/types';
+import { MapConfig, OperatorConfig, AdminMapConfig } from '../features/map/types';
 import r6operators from 'r6operators';
+import { legendItems } from '../features/map/config/legendConfig';
 
 // --- Map Configurations ---
 // Będziemy ładować je dynamicznie z katalogu /maps
@@ -130,20 +131,7 @@ export const availableOperators: OperatorConfig[] = [
 ];
 
 // --- Legend Item Configurations ---
-// (Dodaj więcej symboli według potrzeb)
-export const legendItemsConfig: LegendItemConfig[] = [
-    { id: 'attackerSpawn', symbol: 'A', color: '#4299e1', nameKey: 'legendItems.attackerSpawn' }, // Blue
-    { id: 'defenderSpawn', symbol: 'D', color: '#f6ad55', nameKey: 'legendItems.defenderSpawn' }, // Orange
-    { id: 'objective', symbol: '🎯', color: '#f56565', nameKey: 'legendItems.objective' },         // Red
-    { id: 'camera', symbol: '📷', color: '#a0aec0', nameKey: 'legendItems.camera' },             // Gray
-    { id: 'reinforcement', symbol: '🧱', color: '#718096', nameKey: 'legendItems.reinforcement' }, // Dark Gray
-    { id: 'hatch', symbol: 'H', color: '#a0aec0', nameKey: 'legendItems.hatch' },                 // Gray
-    { id: 'softWall', symbol: 'SW', color: '#fed7d7', nameKey: 'legendItems.softWall' },           // Light Red
-    { id: 'breach', symbol: '💥', color: '#ed8936', nameKey: 'legendItems.breach' },             // Orange
-    { id: 'droneHole', symbol: '>', color: '#cbd5e0', nameKey: 'legendItems.droneHole' },        // Light Gray
-    { id: 'lineOfSight', symbol: '👁️', color: '#63b3ed', nameKey: 'legendItems.lineOfSight' },    // Light Blue
-    // Można dodać więcej: default plant, rotate, shield placement etc.
-];
+export { legendItems };
 
 // --- Helper Functions ---
 

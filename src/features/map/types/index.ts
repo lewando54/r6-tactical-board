@@ -14,12 +14,22 @@ export interface OperatorConfig {
   icon: string;
 }
 
-export interface LegendItemConfig {
+
+export type LegendItemConfigSymbol = {
+    symbol: string;
+    svgSource?: never;
+}
+
+export type LegendItemConfigSVG = {
+    symbol?: never;
+    svgSource: string;
+}
+
+export type LegendItemConfig = {
     id: string;
-    symbol: string; // Symbol lub ikona
     color: string;
     nameKey: string; // Klucz i18n dla opisu
-}
+} & (LegendItemConfigSymbol | LegendItemConfigSVG);
 
 export interface CalloutConfig {
     nameKey: string; // Klucz i18n
@@ -27,19 +37,24 @@ export interface CalloutConfig {
     y: number;
 }
 
+export interface MapIconConfig {
+    legendId: string;
+    x: number;
+    y: number;
+}
+
 export interface AdminMapConfig {
     floors: {
       callouts?: CalloutConfig[];
-    }[]; // Tablica obiektów z indeksem piętra i opcjonalnymi calloutami
-    // Można dodać inne predefiniowane elementy: kamery, wzmocnienia itp.
-    // predefinedElements?: MapElement[];
+      icons?: MapIconConfig[];
+    }[];
 }
 
 
 
 // --- Stan Mapy i Elementy ---
 
-export type Tool = 'select' | 'tempMarker' | 'permMarker' | 'operator' | 'arrow' | 'text' | 'draw' | 'erase';
+export type Tool = 'select' | 'tempMarker' | 'permMarker' | 'operator' | 'arrow' | 'text' | 'draw' | 'erase' | 'legendIcon';
 
 // Podstawowy interfejs dla wszystkich elementów na mapie
 interface BaseElement {
@@ -98,8 +113,29 @@ export interface DrawingElement { // Rysowanie nie potrzebuje x, y
     floorIndex?: number; // Opcjonalne pole określające numer piętra
 }
 
+// Dodajemy nowy typ elementu dla ikon z legendy
+export interface LegendIconElementBase extends BaseElement {
+    type: 'legendIcon';
+    legendId: string; // ID z LegendItemConfig
+    color: string;
+    width: number;
+    height: number;
+}
+
+export type LegendIconElementSymbol = {
+    symbol: string;
+    svgSource?: never;
+};
+
+export type LegendIconElementSVG = {
+    symbol?: never;
+    svgSource: string;
+};
+
+export type LegendIconElement = LegendIconElementBase & (LegendIconElementSymbol | LegendIconElementSVG);
+
 // Discriminated Union dla wszystkich możliwych elementów mapy
-export type MapElement = PermMarkerElement | OperatorElement | ArrowElement | TextElement | DrawingElement;
+export type MapElement = PermMarkerElement | OperatorElement | ArrowElement | TextElement | DrawingElement | LegendIconElement;
 
 
 // Stan Konva Stage
@@ -112,19 +148,17 @@ export interface KonvaStageState {
 // Główny interfejs stanu mapy
 export interface MapState {
   mapId: string | null;
-  // Zamiast pojedynczej tablicy elementów, przechowujemy mapę z elementami dla poszczególnych pięter
   elementsByFloor: { [floorIndex: number]: MapElement[] };
   currentTool: Tool;
   selectedColor: string;
   selectedOperator: OperatorConfig | null;
+  selectedLegendItem: LegendItemConfig | null;
+  legendItems: LegendItemConfig[];
   stageState: KonvaStageState;
   history: {
     elementsByFloor: { [floorIndex: number]: MapElement[] }[];
     stageState: KonvaStageState[];
   };
-  // Można dodać inne stany, np.:
-  // isDrawing: boolean;
-  // selectedElementId: number | null;
 }
 
 // Typy dla akcji reducera (Discriminated Union)
@@ -133,14 +167,12 @@ export type MapAction =
   | { type: 'SET_TOOL'; payload: Tool }
   | { type: 'SET_COLOR'; payload: string }
   | { type: 'SET_OPERATOR'; payload: OperatorConfig | null }
-  | { type: 'ADD_ELEMENT'; payload: { floor: number; element: MapElement } } // Dodajemy informację o piętrze
-  | { type: 'REMOVE_ELEMENT'; payload: { floor: number; id: number } } // Dodajemy informację o piętrze
-  | { type: 'UPDATE_ELEMENT'; payload: { floor: number; id: number; updates: Partial<MapElement> } } // Dodajemy informację o piętrze
+  | { type: 'SET_LEGEND_ITEM'; payload: LegendItemConfig | null }
+  | { type: 'ADD_ELEMENT'; payload: { floor: number; element: MapElement } }
+  | { type: 'REMOVE_ELEMENT'; payload: { floor: number; id: number } }
+  | { type: 'UPDATE_ELEMENT'; payload: { floor: number; id: number; updates: Partial<MapElement> } }
   | { type: 'SET_STAGE_STATE'; payload: Partial<KonvaStageState> }
   | { type: 'LOAD_STATE'; payload: Partial<MapState> }
-  | { type: 'CLEAR_CANVAS'; payload?: { floor?: number } } // Opcjonalnie można wyczyścić tylko konkretne piętro
+  | { type: 'CLEAR_CANVAS'; payload?: { floor?: number } }
   | { type: 'UNDO' }
-  // | { type: 'START_DRAWING' }
-  // | { type: 'UPDATE_DRAWING_POINTS'; payload: number[] }
-  // | { type: 'FINISH_DRAWING'; payload: DrawingElement } // Przekaż gotowy element
   ;

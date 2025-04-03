@@ -42,5 +42,16 @@
     "bank": "Bank",
     "consulate": "Konsulat",
     "oregon": "Oregon"
+  },
+  "mapCallouts": {
+    "oregon": {
+      "kitchen": "Kuchnia",
+      "diningRoom": "Jadalnia",
+      "basementEntry": "Zejście do piwnicy",
+      "stairs": "Schody"
+    }
+  },
+  "common": {
+    "cancel": "Anuluj"
   }
 }

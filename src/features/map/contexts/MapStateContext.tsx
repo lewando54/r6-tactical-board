@@ -1,5 +1,6 @@
 import React, { createContext, useReducer, useContext, Dispatch, ReactNode, useEffect } from 'react';
 import { MapState, MapAction, MapElement, KonvaStageState } from '../types'; // Importuj typy
+import { legendItems } from '../config/legendConfig';
 
 // Maksymalna liczba kroków historii
 const MAX_HISTORY_LENGTH = 50;
@@ -11,6 +12,8 @@ const initialState: MapState = {
   currentTool: 'select',
   selectedColor: '#ff0000',
   selectedOperator: null,
+  selectedLegendItem: null,
+  legendItems: legendItems,
   stageState: { x: 0, y: 0, scale: 1 },
   history: {
     elementsByFloor: [],

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { legendItemsConfig } from '../../../lib/mapConfig'; // Importuj konfigurację legendy
+import { legendItems } from '../../map/config/legendConfig'; // Importuj konfigurację legendy
 import { LegendItemConfig } from '../types'
 import { FaInfoCircle, FaTimes } from 'react-icons/fa'; // Ikony do przełączania
 
@@ -8,7 +8,7 @@ const Legend: React.FC = () => {
   const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState<boolean>(false); // Stan do kontrolowania widoczności legendy
 
-  if (!legendItemsConfig || legendItemsConfig.length === 0) {
+  if (!legendItems || legendItems.length === 0) {
     return null; // Nie renderuj nic, jeśli nie ma elementów legendy
   }
 
@@ -33,18 +33,21 @@ const Legend: React.FC = () => {
             {t('map.legend', 'Legend')}
           </h4>
           <ul className="space-y-1">
-            {legendItemsConfig.map((item: LegendItemConfig) => (
-              <li key={item.id} className="flex items-center text-xs text-gray-300">
+            {legendItems.map((item: LegendItemConfig) => (
+              <li key={item.id} className="flex items-center text-xs text-gray-800">
                 {/* Symbol lub kolorowy kwadrat */}
-                <span
-                  className="w-3 h-3 rounded-sm mr-2 inline-block border border-gray-500 flex-shrink-0"
-                  style={{ backgroundColor: item.color }} // Użyj koloru z konfiguracji
-                  aria-hidden="true" // Dekoracyjny element
+                <div
+                  className="w-8 h-8 rounded-sm mr-2 border border-gray-500 flex items-center justify-center flex-shrink-0"
+                  style={{ backgroundColor: item.color }}
+                  aria-hidden="true"
                 >
-                  {/* Opcjonalnie wyświetl symbol wewnątrz kwadratu, jeśli nie ma koloru lub dla dodatkowego info */}
-                  {/* {item.symbol} */}
-                </span>
-                <span>{t(item.nameKey, item.id)}</span> {/* Wyświetl przetłumaczoną nazwę */}
+                  {item.symbol ? (
+                  <span className="flex items-center justify-center w-full h-full text-lg leading-none">{item.symbol}</span>
+                  ) : (
+                    <span className="flex items-center justify-center w-full h-full text-lg leading-none"><img className="w-5 h-5" src={item.svgSource} /></span>
+                  )}
+                </div>
+                <span className="text-gray-300">{t(item.nameKey, item.id)}</span>
               </li>
             ))}
           </ul>
