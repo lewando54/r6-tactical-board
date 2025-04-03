@@ -268,12 +268,24 @@ const MapCanvas: React.FC<MapCanvasProps> = ({ mapImageUrl, currentFloor, adminC
      const pos = getRelativePointerPosition(stage);
      if (!pos) return;
 
+     // Sprawdź, który przycisk myszy został naciśnięty
+     if (e.evt.button === 1) { // Środkowy przycisk myszy
+         // Włącz tryb przeciągania dla przesuwania widoku
+         stage.draggable(true);
+         // Dodaj tymczasowy event listener dla mouseup
+         const handleMiddleMouseUp = () => {
+             stage.draggable(false);
+             window.removeEventListener('mouseup', handleMiddleMouseUp);
+         };
+         window.addEventListener('mouseup', handleMiddleMouseUp);
+         return;
+     }
+
      // Sprawdź, czy narzędzie wymaga rozpoczęcia rysowania
       const toolsRequiringDrawStart: Tool[] = ['arrow', 'draw', 'erase'];
       if (toolsRequiringDrawStart.includes(currentTool)) {
           setIsDrawing(true);
       }
-
 
      switch (currentTool) {
         case 'tempMarker':
@@ -292,7 +304,7 @@ const MapCanvas: React.FC<MapCanvasProps> = ({ mapImageUrl, currentFloor, adminC
                         type: 'permMarker', 
                         x: pos.x, 
                         y: pos.y, 
-                        radius: 5 * (1 / stageState.scale), 
+                        radius: 5, // Stały rozmiar niezależny od skali
                         fill: selectedColor 
                     }
                 } 
@@ -300,9 +312,9 @@ const MapCanvas: React.FC<MapCanvasProps> = ({ mapImageUrl, currentFloor, adminC
              break;
         case 'operator':
            if (selectedOperator) {
-                // Ustawiamy szerokość i wysokość ikony operatora
-                const opWidth = 30 * (1 / stageState.scale);
-                const opHeight = 30 * (1 / stageState.scale);
+                // Ustawiamy stałe rozmiary ikony operatora
+                const opWidth = 30; // Stały rozmiar niezależny od skali
+                const opHeight = 30;
                 // Dodajemy element operatora z dokładną pozycją kursora
                 dispatch({ 
                     type: 'ADD_ELEMENT', 
@@ -342,7 +354,7 @@ const MapCanvas: React.FC<MapCanvasProps> = ({ mapImageUrl, currentFloor, adminC
                             y: pos.y, 
                             text: text, 
                             fill: selectedColor, 
-                            fontSize: 16 * (1 / stageState.scale) 
+                            fontSize: 16 // Stały rozmiar niezależny od skali
                         }
                     }
                 });
@@ -357,7 +369,7 @@ const MapCanvas: React.FC<MapCanvasProps> = ({ mapImageUrl, currentFloor, adminC
              // Nic nie rób na mousedown na stage
             break;
      }
-  }, [currentTool, dispatch, getRelativePointerPosition, selectedColor, selectedOperator, stageState.scale, currentFloor]);
+  }, [currentTool, dispatch, getRelativePointerPosition, selectedColor, selectedOperator, currentFloor]);
 
   const handleMouseMove = useCallback(() => {
     if (!isDrawing) return;
@@ -392,6 +404,9 @@ const MapCanvas: React.FC<MapCanvasProps> = ({ mapImageUrl, currentFloor, adminC
      if (!stage) return;
      // Pozycja nie jest potrzebna w mouseUp dla tych narzędzi
 
+     // Wyłącz tryb przeciągania po puszczeniu przycisku myszy
+     stage.draggable(currentTool === 'select');
+
      switch (currentTool) {
        case 'draw':
          if (drawingPoints.length >= 4) { // Potrzebujemy przynajmniej 2 punktów (x, y, x, y)
@@ -405,7 +420,7 @@ const MapCanvas: React.FC<MapCanvasProps> = ({ mapImageUrl, currentFloor, adminC
                         // Zapisujemy oryginalne punkty bez skalowania
                         points: drawingPoints, 
                         stroke: selectedColor, 
-                        strokeWidth: 2 * (1 / stageState.scale) 
+                        strokeWidth: 2 // Stały rozmiar niezależny od skali
                     }
                 } 
             });
@@ -429,9 +444,9 @@ const MapCanvas: React.FC<MapCanvasProps> = ({ mapImageUrl, currentFloor, adminC
                                points: drawingPoints, 
                                stroke: selectedColor, 
                                fill: selectedColor, 
-                               strokeWidth: 3 * (1 / stageState.scale), 
-                               pointerLength: 10 * (1 / stageState.scale), 
-                               pointerWidth: 10 * (1 / stageState.scale) 
+                               strokeWidth: 3, // Stały rozmiar niezależny od skali
+                               pointerLength: 10, // Stały rozmiar niezależny od skali
+                               pointerWidth: 10 // Stały rozmiar niezależny od skali
                            }
                        } 
                    });
@@ -451,7 +466,7 @@ const MapCanvas: React.FC<MapCanvasProps> = ({ mapImageUrl, currentFloor, adminC
                               // Zapisujemy oryginalne punkty bez skalowania
                               points: drawingPoints,
                               stroke: '#ffffff', // Kolor gumki (bez znaczenia przy destination-out)
-                              strokeWidth: 10 * (1 / stageState.scale), // Szerokość gumki
+                              strokeWidth: 10, // Stały rozmiar niezależny od skali
                               globalCompositeOperation: 'destination-out', // Kluczowy efekt gumki
                               // Dodatkowe właściwości dla gumki
                               lineCap: 'round',
@@ -466,7 +481,7 @@ const MapCanvas: React.FC<MapCanvasProps> = ({ mapImageUrl, currentFloor, adminC
       // Wyczyść warstwę podglądu
       previewLayerRef.current?.destroyChildren(); // Usuń wszystkie dzieci
       previewLayerRef.current?.batchDraw();
-  }, [isDrawing, currentTool, drawingPoints, dispatch, selectedColor, stageState.scale, currentFloor]);
+  }, [isDrawing, currentTool, drawingPoints, dispatch, selectedColor, currentFloor]);
 
 
   const handleElementClick = useCallback((e: KonvaEventObject<MouseEvent | TouchEvent>, element: MapElement) => {
@@ -514,7 +529,6 @@ const MapCanvas: React.FC<MapCanvasProps> = ({ mapImageUrl, currentFloor, adminC
 
       // --- Define props WITHOUT the key initially ---
       const baseProps = {
-        // key: elementIdStr, // <<< REMOVE KEY FROM HERE
         id: elementIdStr, // Konva oczekuje string ID
         draggable: isDraggable,
         onDragEnd: handleDragEnd,
@@ -525,52 +539,49 @@ const MapCanvas: React.FC<MapCanvasProps> = ({ mapImageUrl, currentFloor, adminC
         shadowOpacity: 0.5,
         shadowOffsetX: 1 / stageState.scale,
         shadowOffsetY: 1 / stageState.scale,
-        strokeWidth: 2 * (1 / stageState.scale),
-        radius: 5 * (1 / stageState.scale),
-        fontSize: 16 * (1 / stageState.scale),
-        pointerWidth: 10 * (1 / stageState.scale),
-        pointerLength: 10 * (1 / stageState.scale),
+        // Podstawowe rozmiary elementów - skalowanie jest stosowane podczas renderowania
+        strokeWidth: 2,
+        radius: 5,
+        fontSize: 16,
+        pointerWidth: 10,
+        pointerLength: 10,
         image: undefined,
       };
       // --- End baseProps definition ---
 
       // Dostosuj propsy w zależności od typu elementu
       const specificProps = { ...baseProps }; // Clone base props
-      if ('strokeWidth' in el) specificProps.strokeWidth = el.strokeWidth * (1 / stageState.scale);
-      if ('radius' in el) specificProps.radius = el.radius * (1 / stageState.scale);
-      if ('fontSize' in el) specificProps.fontSize = el.fontSize * (1 / stageState.scale);
-      if ('pointerLength' in el) specificProps.pointerLength = el.pointerLength * (1 / stageState.scale);
-      if ('pointerWidth' in el) specificProps.pointerWidth = el.pointerWidth * (1 / stageState.scale);
-      // Przesunięcie tekstu/ikony, aby skalowanie było względem środka
-      if (el.type === 'text') {
-          // You might need to adjust text offset based on alignment needs
-          // Konva's offsetX/Y for text often relates to its bounding box
-          // specificProps.offsetX = ...
-          // specificProps.offsetY = ...
-      }
+      if ('strokeWidth' in el) specificProps.strokeWidth = el.strokeWidth;
+      if ('radius' in el) specificProps.radius = el.radius;
+      if ('fontSize' in el) specificProps.fontSize = el.fontSize;
+      if ('pointerLength' in el) specificProps.pointerLength = el.pointerLength;
+      if ('pointerWidth' in el) specificProps.pointerWidth = el.pointerWidth;
+
+      // Zastosuj skalowanie tylko podczas renderowania
+      specificProps.strokeWidth = specificProps.strokeWidth * (1 / stageState.scale);
+      specificProps.radius = specificProps.radius * (1 / stageState.scale);
+      specificProps.fontSize = specificProps.fontSize * (1 / stageState.scale);
+      specificProps.pointerLength = specificProps.pointerLength * (1 / stageState.scale);
+      specificProps.pointerWidth = specificProps.pointerWidth * (1 / stageState.scale);
 
       switch (el.type) {
         case 'permMarker':
           return <Circle
-                    key={elementIdStr} // <<< Apply key directly
+                    key={elementIdStr}
                     {...specificProps}
                     x={el.x}
                     y={el.y}
-                    scaleX={1}  // Usuń skalowanie dla markerów - użyjemy radius
+                    scaleX={1}
                     scaleY={1}
-                    // radius and fill are handled by specificProps or defaults in baseProps
                     fill={el.fill}
                  />;
         case 'operator':
-             // Pass specificProps (which no longer contains 'key')
-             // The OperatorIcon component will spread these onto KonvaImage
              return <OperatorIcon
-                       key={elementIdStr} // <<< Apply key directly
+                       key={elementIdStr}
                        element={el}
-                       commonProps={specificProps} // Pass the props object (without key)
+                       commonProps={specificProps}
                     />;
         case 'arrow':
-          // Używamy transformacji punktów dla strzałek
           return <KonvaArrow
                     key={elementIdStr}
                     {...specificProps}
@@ -594,7 +605,6 @@ const MapCanvas: React.FC<MapCanvasProps> = ({ mapImageUrl, currentFloor, adminC
                     verticalAlign="middle"
                  />;
         case 'drawing':
-            // Używamy transformacji punktów dla rysunków
             return <KonvaLine
                       key={elementIdStr}
                       {...specificProps}
