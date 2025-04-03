@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Text as KonvaText, Image as KonvaImage, Circle } from 'react-konva';
 import { LegendIconElement } from '../types';
 
@@ -8,68 +8,56 @@ interface LegendIconProps {
 
 const svgStringToImage = (svgString: string | undefined | null, width: number, height: number): Promise<HTMLImageElement> => {
   return new Promise((resolve, reject) => {
-      // --- Early validation ---
-      if (!svgString) {
-          console.error("svgStringToImage called with invalid or empty svgString input.");
-          reject(new Error('Invalid or empty SVG string provided'));
-          return;
-      }
-      // --- End validation ---
+    if (!svgString) {
+      console.error("svgStringToImage called with invalid or empty svgString input.");
+      reject(new Error('Invalid or empty SVG string provided'));
+      return;
+    }
 
-      // 1. Create a data URL from the SVG string or use the URL directly
-      let dataUrl: string;
-      if (svgString.startsWith('data:image/svg+xml') || svgString.startsWith('http')) {
-          // If it's already a data URL or http URL, use it directly
-          dataUrl = svgString;
+    let dataUrl: string;
+    if (svgString.startsWith('data:image/svg+xml') || svgString.startsWith('http')) {
+      dataUrl = svgString;
+    } else {
+      const encodedSVG = encodeURIComponent(svgString)
+        .replace(/'/g, '%27')
+        .replace(/"/g, '%22');
+      dataUrl = `data:image/svg+xml;charset=utf-8,${encodedSVG}`;
+    }
+
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+
+    img.onload = () => {
+      if (img.naturalWidth > 0 && img.naturalHeight > 0) {
+        resolve(img);
       } else {
-          // Encode potentially problematic characters like #
-          const encodedSVG = encodeURIComponent(svgString)
-                              .replace(/'/g, '%27')
-                              .replace(/"/g, '%22');
-          dataUrl = `data:image/svg+xml;charset=utf-8,${encodedSVG}`;
+        setTimeout(() => {
+          if (img.naturalWidth > 0 && img.naturalHeight > 0) {
+            resolve(img);
+          } else {
+            console.error("SVG loaded but has zero dimensions:", svgString.substring(0, 100));
+            reject(new Error('SVG failed to load with valid dimensions'));
+          }
+        }, 50);
       }
+    };
 
-      // 2. Create an HTML Image element
-      const img = new Image();
-      img.crossOrigin = 'anonymous';
+    img.onerror = (event: string | Event) => {
+      console.error("Error loading SVG:", event, svgString.substring(0, 100));
+      reject(new Error('Failed to load SVG'));
+    };
 
-      img.onload = () => {
-          // Check if dimensions are valid
-           if (img.naturalWidth > 0 && img.naturalHeight > 0) {
-               resolve(img);
-           } else {
-               // Sometimes onload fires too early for SVG data URLs? Add a small delay as fallback.
-                setTimeout(() => {
-                    if (img.naturalWidth > 0 && img.naturalHeight > 0) {
-                        resolve(img);
-                    } else {
-                       console.error("SVG loaded but has zero dimensions:", svgString.substring(0, 100));
-                       reject(new Error('SVG failed to load with valid dimensions'));
-                    }
-                }, 50);
-           }
-      };
-
-      img.onerror = (event: string | Event) => {
-          console.error("Error loading SVG:", event, svgString.substring(0, 100));
-          reject(new Error('Failed to load SVG'));
-      };
-
-      // 3. Set the source to the data URL
-      img.src = dataUrl;
-      // Optional: Explicitly set dimensions
-      img.width = width;
-      img.height = height;
+    img.src = dataUrl;
+    img.width = width;
+    img.height = height;
   });
 };
 
 const LegendIcon: React.FC<LegendIconProps> = ({ element }) => {
   const [imageElement, setImageElement] = useState<HTMLImageElement | null>(null);
   const [error, setError] = useState<boolean>(false);
-  const isMountedRef = useRef(true);
 
   useEffect(() => {
-    isMountedRef.current = true;
     let active = true;
 
     setImageElement(null);
@@ -78,12 +66,12 @@ const LegendIcon: React.FC<LegendIconProps> = ({ element }) => {
     if ('svgSource' in element && element.svgSource) {
       svgStringToImage(element.svgSource, element.width, element.height)
         .then((img: HTMLImageElement) => {
-          if (isMountedRef.current && active) {
+          if (active) {
             setImageElement(img);
           }
         })
         .catch((err: Error) => {
-          if (isMountedRef.current && active) {
+          if (active) {
             console.error(`Failed to render SVG for legend icon ${element.legendId}:`, err);
             setError(true);
           }
@@ -91,7 +79,6 @@ const LegendIcon: React.FC<LegendIconProps> = ({ element }) => {
     }
 
     return () => {
-      isMountedRef.current = false;
       active = false;
     };
   }, [element.svgSource, element.legendId, element.width, element.height]);

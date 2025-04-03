@@ -6,7 +6,10 @@
   },
   "map": {
       "title": "Map: {{mapName}}",
+      "roof": "Roof",
       "floor": "Floor",
+      "nthFloor": "{{floorNumber}} floor",
+      "basement": "Basement",
       "legend": "Legend",
       "export": "Export Strategy (.json)",
       "import": "Import Strategy (.json)",
@@ -40,7 +43,8 @@
   "maps": {
     "coastline": "Coastline",
     "bank": "Bank",
-    "consulate": "Consulate"
+    "consulate": "Consulate",
+    "skyscraper": "Skyscraper"
   },
   "mapCallouts": {
     "oregon": {

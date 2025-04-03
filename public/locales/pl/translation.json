@@ -6,7 +6,11 @@
   },
   "map": {
     "title": "Mapa: {{mapName}}",
+    "roof": "Dach",
     "floor": "Piętro",
+    "nthFloor": "Piętro {{floorNumber}}",
+    "basement": "Piwnica",
+    "ground": "Parter",
     "legend": "Legenda",
     "export": "Eksportuj strategię (.json)",
     "import": "Importuj strategię (.json)",
@@ -41,7 +45,8 @@
     "coastline": "Wybrzeże",
     "bank": "Bank",
     "consulate": "Konsulat",
-    "oregon": "Oregon"
+    "oregon": "Oregon",
+    "skyscraper": "Wieżowiec"
   },
   "mapCallouts": {
     "oregon": {

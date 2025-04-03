@@ -34,22 +34,163 @@ export const loadAvailableMaps = async (): Promise<MapConfig[]> => {
 const getStaticMapsList = (): MapConfig[] => {
   return [
     // Standard / Ranked Maps (przybliżona liczba pięter, może wymagać korekty)
-    { id: 'bank', nameKey: 'maps.bank', floors: 4, menuImage: '/maps/r6-maps-fallback.jpg' }, // Basement, 1F, 2F, Roof
-    { id: 'border', nameKey: 'maps.border', floors: 2, menuImage: '/maps/r6-maps-fallback.jpg' }, // 1F, 2F
-    { id: 'chalet', nameKey: 'maps.chalet', floors: 3, menuImage: '/maps/r6-maps-fallback.jpg' }, // Basement, 1F, 2F
-    { id: 'clubhouse', nameKey: 'maps.clubhouse', floors: 3, menuImage: '/maps/r6-maps-fallback.jpg' }, // Basement, 1F, 2F
-    { id: 'coastline', nameKey: 'maps.coastline', floors: 2, menuImage: '/maps/r6-maps-fallback.jpg' }, // 1F, 2F
-    { id: 'consulate', nameKey: 'maps.consulate', floors: 3, menuImage: '/maps/r6-maps-fallback.jpg' }, // Basement, 1F, 2F
-    { id: 'emerald_plains', nameKey: 'maps.emerald_plains', floors: 2, menuImage: '/maps/r6-maps-fallback.jpg' }, // 1F, 2F
-    { id: 'kafe_dostoyevsky', nameKey: 'maps.kafe_dostoyevsky', floors: 3, menuImage: '/maps/r6-maps-fallback.jpg' }, // 1F, 2F, 3F
-    { id: 'kanal', nameKey: 'maps.kanal', floors: 4, menuImage: '/maps/r6-maps-fallback.jpg' }, // Basement, 1F, 2F, Roof Access (jako osobne piętra?) - Sprawdź strukturę map
-    { id: 'nighthaven_labs', nameKey: 'maps.nighthaven_labs', floors: 3, menuImage: '/maps/r6-maps-fallback.jpg' }, // B, 1F, 2F - Do weryfikacji
-    { id: 'oregon', nameKey: 'maps.oregon', floors: 5, menuImage: '/maps/r6-maps-fallback.jpg' }, // Basement, 1F, 2F
-    { id: 'outback', nameKey: 'maps.outback', floors: 2, menuImage: '/maps/r6-maps-fallback.jpg' }, // 1F, 2F
-    { id: 'skyscraper', nameKey: 'maps.skyscraper', floors: 2, menuImage: '/maps/r6-maps-fallback.jpg' }, // 1F, 2F
-    { id: 'stadium_bravo', nameKey: 'maps.stadium_bravo', floors: 2, menuImage: '/maps/r6-maps-fallback.jpg' }, // 1F, 2F (Połączenie Oregon/Hereford?)
-    { id: 'theme_park', nameKey: 'maps.theme_park', floors: 2, menuImage: '/maps/r6-maps-fallback.jpg' }, // 1F, 2F
-    { id: 'villa', nameKey: 'maps.villa', floors: 3, menuImage: '/maps/r6-maps-fallback.jpg' }, // Basement, 1F, 2F
+    { 
+      id: 'bank', 
+      nameKey: 'maps.bank', 
+      floors: [
+        { nameKey: 'maps.bank.basement', floorNumber: -1 },
+        { nameKey: 'maps.bank.ground', floorNumber: 0 },
+        { nameKey: 'maps.bank.first', floorNumber: 1 },
+        { nameKey: 'maps.bank.second', floorNumber: 2 }
+      ], 
+      menuImage: '/maps/r6-maps-fallback.jpg' 
+    },
+    { 
+      id: 'border', 
+      nameKey: 'maps.border', 
+      floors: [
+        { nameKey: 'maps.border.ground', floorNumber: 0 },
+        { nameKey: 'maps.border.first', floorNumber: 1 }
+      ], 
+      menuImage: '/maps/r6-maps-fallback.jpg' 
+    },
+    { 
+      id: 'chalet', 
+      nameKey: 'maps.chalet', 
+      floors: [
+        { nameKey: 'maps.chalet.basement', floorNumber: -1 },
+        { nameKey: 'maps.chalet.ground', floorNumber: 0 },
+        { nameKey: 'maps.chalet.first', floorNumber: 1 }
+      ], 
+      menuImage: '/maps/r6-maps-fallback.jpg' 
+    },
+    { 
+      id: 'clubhouse', 
+      nameKey: 'maps.clubhouse', 
+      floors: [
+        { nameKey: 'maps.clubhouse.basement', floorNumber: -1 },
+        { nameKey: 'maps.clubhouse.ground', floorNumber: 0 },
+        { nameKey: 'maps.clubhouse.first', floorNumber: 1 }
+      ], 
+      menuImage: '/maps/r6-maps-fallback.jpg' 
+    },
+    { 
+      id: 'coastline', 
+      nameKey: 'maps.coastline', 
+      floors: [
+        { nameKey: 'maps.coastline.ground', floorNumber: 0 },
+        { nameKey: 'maps.coastline.first', floorNumber: 1 }
+      ], 
+      menuImage: '/maps/r6-maps-fallback.jpg' 
+    },
+    { 
+      id: 'consulate', 
+      nameKey: 'maps.consulate', 
+      floors: [
+        { nameKey: 'maps.consulate.basement', floorNumber: -1 },
+        { nameKey: 'maps.consulate.ground', floorNumber: 0 },
+        { nameKey: 'maps.consulate.first', floorNumber: 1 }
+      ], 
+      menuImage: '/maps/r6-maps-fallback.jpg' 
+    },
+    { 
+      id: 'emerald_plains', 
+      nameKey: 'maps.emerald_plains', 
+      floors: [
+        { nameKey: 'maps.emerald_plains.ground', floorNumber: 0 },
+        { nameKey: 'maps.emerald_plains.first', floorNumber: 1 }
+      ], 
+      menuImage: '/maps/r6-maps-fallback.jpg' 
+    },
+    { 
+      id: 'kafe_dostoyevsky', 
+      nameKey: 'maps.kafe_dostoyevsky', 
+      floors: [
+        { nameKey: 'maps.kafe_dostoyevsky.ground', floorNumber: 0 },
+        { nameKey: 'maps.kafe_dostoyevsky.first', floorNumber: 1 },
+        { nameKey: 'maps.kafe_dostoyevsky.second', floorNumber: 2 }
+      ], 
+      menuImage: '/maps/r6-maps-fallback.jpg' 
+    },
+    { 
+      id: 'kanal', 
+      nameKey: 'maps.kanal', 
+      floors: [
+        { nameKey: 'maps.kanal.basement', floorNumber: -1 },
+        { nameKey: 'maps.kanal.ground', floorNumber: 0 },
+        { nameKey: 'maps.kanal.first', floorNumber: 1 },
+        { nameKey: 'maps.kanal.second', floorNumber: 2 }
+      ], 
+      menuImage: '/maps/r6-maps-fallback.jpg' 
+    },
+    { 
+      id: 'nighthaven_labs', 
+      nameKey: 'maps.nighthaven_labs', 
+      floors: [
+        { nameKey: 'maps.nighthaven_labs.basement', floorNumber: -1 },
+        { nameKey: 'maps.nighthaven_labs.ground', floorNumber: 0 },
+        { nameKey: 'maps.nighthaven_labs.first', floorNumber: 1 }
+      ], 
+      menuImage: '/maps/r6-maps-fallback.jpg' 
+    },
+    { 
+      id: 'oregon', 
+      nameKey: 'maps.oregon', 
+      floors: [
+        { nameKey: 'maps.oregon.basement', floorNumber: -1 },
+        { nameKey: 'maps.oregon.ground', floorNumber: 0 },
+        { nameKey: 'maps.oregon.first', floorNumber: 1 },
+        { nameKey: 'maps.oregon.second', floorNumber: 2 },
+        { nameKey: 'maps.oregon.third', floorNumber: 3 }
+      ], 
+      menuImage: '/maps/r6-maps-fallback.jpg' 
+    },
+    { 
+      id: 'outback', 
+      nameKey: 'maps.outback', 
+      floors: [
+        { nameKey: 'maps.outback.ground', floorNumber: 0 },
+        { nameKey: 'maps.outback.first', floorNumber: 1 }
+      ], 
+      menuImage: '/maps/r6-maps-fallback.jpg' 
+    },
+    { 
+      id: 'skyscraper', 
+      nameKey: 'maps.skyscraper', 
+      floors: [
+        { nameKey: 'maps.skyscraper.ground', floorNumber: 0 },
+        { nameKey: 'maps.skyscraper.first', floorNumber: 1 }
+      ], 
+      menuImage: '/maps/r6-maps-fallback.jpg' 
+    },
+    { 
+      id: 'stadium_bravo', 
+      nameKey: 'maps.stadium_bravo', 
+      floors: [
+        { nameKey: 'maps.stadium_bravo.ground', floorNumber: 0 },
+        { nameKey: 'maps.stadium_bravo.first', floorNumber: 1 }
+      ], 
+      menuImage: '/maps/r6-maps-fallback.jpg' 
+    },
+    { 
+      id: 'theme_park', 
+      nameKey: 'maps.theme_park', 
+      floors: [
+        { nameKey: 'maps.theme_park.ground', floorNumber: 0 },
+        { nameKey: 'maps.theme_park.first', floorNumber: 1 }
+      ], 
+      menuImage: '/maps/r6-maps-fallback.jpg' 
+    },
+    { 
+      id: 'villa', 
+      nameKey: 'maps.villa', 
+      floors: [
+        { nameKey: 'maps.villa.basement', floorNumber: -1 },
+        { nameKey: 'maps.villa.ground', floorNumber: 0 },
+        { nameKey: 'maps.villa.first', floorNumber: 1 }
+      ], 
+      menuImage: '/maps/r6-maps-fallback.jpg' 
+    }
   ];
 };
 
@@ -138,12 +279,20 @@ export { legendItems };
 /**
  * Generates the image URL for a specific map floor based on convention.
  * @param mapId - The ID of the map (e.g., 'coastline').
- * @param floorIndex - The 0-based index of the floor.
+ * @param floorNumber - The number of the floor (e.g., -1 for basement, 0 for ground floor).
  * @returns The relative URL path to the map image.
  */
-export const getMapImageUrl = (mapId: string, floorIndex: number): string => {
-    // Example naming convention: /maps/{mapId}/r6-maps-{mapId}-blueprint-{floorIndex}.jpg
-    return `/maps/${mapId}/r6-maps-${mapId}-blueprint-${floorIndex + 1}.jpg`;
+export const getMapImageUrl = (mapId: string, floorNumber: number): string => {
+    // Konwencja nazewnictwa plików: /maps/{mapId}/r6-maps-{mapId}-blueprint-{floorIndex}.jpg
+    // floorIndex jest 1-based, więc musimy znaleźć odpowiedni indeks dla danego piętra
+    // Przykład dla Oregon:
+    // -1 (piwnica) -> 1
+    // 0 (parter) -> 2
+    // 1 (1 piętro) -> 3
+    // 2 (2 piętro) -> 4
+    // 3 (3 piętro) -> 5
+    const floorIndex = floorNumber + 2; // Przesunięcie o 2, aby piwnica (-1) dawała indeks 1
+    return `/maps/${mapId}/r6-maps-${mapId}-blueprint-${floorIndex}.jpg`;
 }
 
 /**

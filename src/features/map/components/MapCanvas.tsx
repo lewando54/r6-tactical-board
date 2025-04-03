@@ -1,10 +1,10 @@
 import React, { useRef, useEffect, useState, useCallback, ComponentProps } from 'react';
-import { Stage, Layer, Image as KonvaImage, Circle, Arrow as KonvaArrow, Text as KonvaText, Line as KonvaLine } from 'react-konva';
+import { Stage, Layer, Image as KonvaImage, Circle, Arrow as KonvaArrow, Text as KonvaText, Line as KonvaLine, Rect } from 'react-konva';
 import Konva from 'konva'; // Importuj Konva dla typów
 import { KonvaEventObject } from 'konva/lib/Node'; // Typ dla eventów Konva
 import useImage from 'use-image';
 import { useMapState, useMapDispatch } from '../contexts/MapStateContext';
-import { MapElement, OperatorElement, AdminMapConfig, CalloutConfig, MapIconConfig, Tool, LegendIconElement, LegendIconElementBase, LegendIconElementSymbol, LegendIconElementSVG } from '../types'; // Importuj typy
+import { MapElement, OperatorElement, AdminMapConfig, CalloutConfig, MapIconConfig, Tool, LegendIconElement } from '../types'; // Importuj typy
 import { useTranslation } from 'react-i18next';
 import { legendItems } from '../config/legendConfig';
 
@@ -259,6 +259,7 @@ const MapCanvas: React.FC<MapCanvasProps> = ({ mapImageUrl, currentFloor, adminC
   const [canvasSize, setCanvasSize] = useState<{ width: number; height: number }>({ width: 500, height: 500 }); // Domyślny rozmiar
   const [mousePosition, setMousePosition] = useState<{ x: number; y: number } | null>(null);
   const { t } = useTranslation();
+  const textRef = useRef<Konva.Text>(null);
 
   // Efekt do ustawiania rozmiaru canvasa
   useEffect(() => {
@@ -466,26 +467,44 @@ const MapCanvas: React.FC<MapCanvasProps> = ({ mapImageUrl, currentFloor, adminC
             break;
         case 'legendIcon':
             if (mapState.selectedLegendItem) {
-                // Ustawiamy stałe rozmiary ikony
-                const iconSize = 30; // Stały rozmiar niezależny od skali
-                // Dodajemy element ikony z dokładną pozycją kursora
+                const iconSize = 30;
+                
+                // Tworzymy element legendy w zależności od typu
+                let element: LegendIconElement;
+                
+                if (mapState.selectedLegendItem.svgSource) {
+                    // Element z SVG
+                    element = {
+                        id: 0,
+                        type: 'legendIcon',
+                        x: pos.x,
+                        y: pos.y,
+                        legendId: mapState.selectedLegendItem.id,
+                        color: mapState.selectedLegendItem.color,
+                        width: iconSize,
+                        height: iconSize,
+                        svgSource: mapState.selectedLegendItem.svgSource
+                    };
+                } else {
+                    // Element z symbolem
+                    element = {
+                        id: 0,
+                        type: 'legendIcon',
+                        x: pos.x,
+                        y: pos.y,
+                        legendId: mapState.selectedLegendItem.id,
+                        color: mapState.selectedLegendItem.color,
+                        width: iconSize,
+                        height: iconSize,
+                        symbol: mapState.selectedLegendItem.symbol || '?'
+                    };
+                }
+                
                 dispatch({ 
                     type: 'ADD_ELEMENT', 
                     payload: { 
                         floor: currentFloor,
-                        element: { 
-                            id: 0, 
-                            type: 'legendIcon', 
-                            x: pos.x, 
-                            y: pos.y, 
-                            legendId: mapState.selectedLegendItem.id,
-                            color: mapState.selectedLegendItem.color,
-                            width: iconSize,
-                            height: iconSize,
-                            ...(mapState.selectedLegendItem.svgSource ? 
-                                { svgSource: mapState.selectedLegendItem.svgSource } : 
-                                { symbol: mapState.selectedLegendItem.symbol })
-                        } 
+                        element
                     }
                 });
             }
@@ -801,7 +820,7 @@ const MapCanvas: React.FC<MapCanvasProps> = ({ mapImageUrl, currentFloor, adminC
             return null;
         }
 
-        const currentFloorConfig = adminConfig.floors[currentFloor];
+        const currentFloorConfig = adminConfig.floors[currentFloor + 1];
         if (!currentFloorConfig) return null;
 
         return (
@@ -815,18 +834,13 @@ const MapCanvas: React.FC<MapCanvasProps> = ({ mapImageUrl, currentFloor, adminC
                     return (
                         <React.Fragment key={`callout-${index}-${callout.nameKey}`}>
                             {/* Tło */}
-                            <KonvaText
-                                x={callout.x}
-                                y={callout.y}
-                                text={text}
-                                fontSize={fontSize}
-                                fill="transparent"
-                                listening={false}
-                                padding={padding}
-                                background="rgba(0, 0, 0, 0.7)"
-                                cornerRadius={4 / stageState.scale}
-                                align="center"
-                                verticalAlign="middle"
+                            <Rect
+                            x={callout.x}
+                            y={callout.y}
+                            fill="rgba(0, 0, 0, 0.5)"
+                            width={textRef.current?.width()}
+                            height={fontSize * 1.8}
+                            cornerRadius={2}
                             />
                             {/* Tekst */}
                             <KonvaText
@@ -839,6 +853,7 @@ const MapCanvas: React.FC<MapCanvasProps> = ({ mapImageUrl, currentFloor, adminC
                                 padding={padding}
                                 align="center"
                                 verticalAlign="middle"
+                                ref={textRef}
                             />
                         </React.Fragment>
                     );

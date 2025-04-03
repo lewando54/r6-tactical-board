@@ -1,10 +1,15 @@
 // src/features/map/types/index.ts
 
 // --- Konfiguracja ---
+export interface Floor {
+  nameKey: string;
+  floorNumber: number;
+}
+
 export interface MapConfig {
   id: string;
   nameKey: string; // Klucz i18n dla nazwy mapy
-  floors: number; // Liczba pięter (plików obrazków)
+  floors: Floor[]; // Tablica obiektów pięter
   menuImage: string; // Ścieżka do obrazu mapy w menu
 }
 

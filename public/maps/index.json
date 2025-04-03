@@ -3,8 +3,48 @@
         {
             "id": "oregon",
             "nameKey": "maps.oregon",
-            "floors": 5,
+            "floors": [
+                {
+                    "nameKey": "map.basement",
+                    "floorNumber": -1
+                },
+                {
+                    "nameKey": "map.ground",
+                    "floorNumber": 0
+                },
+                {
+                    "nameKey": "map.nthFloor",
+                    "floorNumber": 1
+                },
+                {
+                    "nameKey": "map.nthFloor",
+                    "floorNumber": 2
+                },
+                {
+                    "nameKey": "map.nthFloor",
+                    "floorNumber": 3
+                }
+            ],
             "menuImage": "r6-maps-oregon.jpg"
+        },
+        {
+            "id": "skyscraper",
+            "nameKey": "maps.skyscraper",
+            "floors": [
+                {
+                    "nameKey": "map.ground",
+                    "floorNumber": 0
+                },
+                {
+                    "nameKey": "map.nthFloor",
+                    "floorNumber": 1
+                },
+                {
+                    "nameKey": "map.nthFloor",
+                    "floorNumber": 2
+                }
+            ],
+            "menuImage": "r6-maps-skyscraper.jpg"
         }
     ]
 }
