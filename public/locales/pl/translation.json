@@ -1,0 +1,46 @@
+{
+  "menu": {
+    "title": "Tablica Taktyczna",
+    "selectMap": "Wybierz mapę:",
+    "language": "Język"
+  },
+  "map": {
+    "title": "Mapa: {{mapName}}",
+    "floor": "Piętro",
+    "legend": "Legenda",
+    "export": "Eksportuj strategię (.json)",
+    "import": "Importuj strategię (.json)",
+    "clear": "Wyczyść płótno",
+    "undo": "Cofnij (Ctrl+Z)"
+  },
+  "toolbar": {
+    "select": "Wybierz/Przesuń",
+    "tempMarker": "Dodaj tymczasowy znacznik",
+    "permMarker": "Dodaj stały znacznik",
+    "operator": "Dodaj operatora",
+    "arrow": "Narysuj strzałkę",
+    "text": "Dodaj tekst",
+    "draw": "Rysuj swobodnie",
+    "erase": "Wymaż",
+    "color": "Kolor"
+  },
+  "legendItems": {
+    "attackerSpawn": "Miejsce pojawienia się atakujących",
+    "defenderSpawn": "Miejsce pojawienia się obrońców",
+    "objective": "Cel",
+    "camera": "Kamera",
+    "reinforcement": "Wsparcie"
+  },
+  "operators": {
+    "ash": "Ash",
+    "thermite": "Thermite",
+    "kapkan": "Kapkan",
+    "mute": "Mute"
+  },
+  "maps": {
+    "coastline": "Wybrzeże",
+    "bank": "Bank",
+    "consulate": "Konsulat",
+    "oregon": "Oregon"
+  }
+}

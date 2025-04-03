@@ -1,0 +1,54 @@
+{ "floors": [
+  {"callouts": [
+    {"name": "Kitchen", "coordinates": [0.5, 0.5], "type": "room"},
+    {"name": "Dining Room", "coordinates": [0.6, 0.4], "type": "room"},
+    {"name": "Living Room", "coordinates": [0.7, 0.3], "type": "room"},
+    {"name": "Basement", "coordinates": [0.4, 0.2], "type": "room"},
+    {"name": "Garage", "coordinates": [0.3, 0.1], "type": "room"},
+    {"name": "Laundry Room", "coordinates": [0.2, 0.2], "type": "room"},
+    {"name": "Stairs", "coordinates": [0.5, 0.1], "type": "room"},
+    {"name": "Main Entrance", "coordinates": [0.6, 0.2], "type": "entrance"},
+    {"name": "Back Entrance", "coordinates": [0.4, 0.3], "type": "entrance"}
+  ]},
+  {"callouts": [
+    {"name": "Second Floor", "coordinates": [0.5, 0.5], "type": "room"},
+    {"name": "Master Bedroom", "coordinates": [0.6, 0.4], "type": "room"},
+    {"name": "Bathroom", "coordinates": [0.7, 0.3], "type": "room"},
+    {"name": "Hallway", "coordinates": [0.4, 0.2], "type": "room"},
+    {"name": "Attic", "coordinates": [0.3, 0.1], "type": "room"},
+    {"name": "Roof", "coordinates": [0.2, 0.2], "type": "room"},
+    {"name": "Stairs", "coordinates": [0.5, 0.1], "type": "room"},
+    {"name": "Main Entrance", "coordinates": [0.6, 0.2], "type": "entrance"},
+    {"name": "Back Entrance", "coordinates": [0.4, 0.3], "type": "entrance"}
+  ]},
+  {"callouts": [
+    {"name": "First Floor", "coordinates": [0.5, 0.5], "type": "room"},
+    {"name": "Living Room", "coordinates": [0.6, 0.4], "type": "room"},
+    {"name": "Dining Room", "coordinates": [0.7, 0.3], "type": "room"},
+    {"name": "Kitchen", "coordinates": [0.4, 0.2], "type": "room"},
+    {"name": "Basement", "coordinates": [0.3, 0.1], "type": "room"},
+    {"name": "Garage", "coordinates": [0.2, 0.2], "type": "room"},
+    {"name": "Laundry Room", "coordinates": [0.5, 0.1], "type": "room"},
+    {"name": "Main Entrance", "coordinates": [0.6, 0.2], "type": "entrance"},
+    {"name": "Back Entrance", "coordinates": [0.4, 0.3], "type": "entrance"}
+  ]},
+  {"callouts": [
+    {"name": "Basement", "coordinates": [0.5, 0.5], "type": "room"},
+    {"name": "Garage", "coordinates": [0.6, 0.4], "type": "room"},
+    {"name": "Laundry Room", "coordinates": [0.7, 0.3], "type": "room"},
+    {"name": "Stairs", "coordinates": [0.4, 0.2], "type": "room"},
+    {"name": "Main Entrance", "coordinates": [0.3, 0.1], "type": "entrance"},
+    {"name": "Back Entrance", "coordinates": [0.2, 0.2], "type": "entrance"}
+  ]},
+  {"callouts": [
+    {"name": "First Floor", "coordinates": [0.5, 0.5], "type": "room"},
+    {"name": "Living Room", "coordinates": [0.6, 0.4], "type": "room"},
+    {"name": "Dining Room", "coordinates": [0.7, 0.3], "type": "room"},
+    {"name": "Kitchen", "coordinates": [0.4, 0.2], "type": "room"},
+    {"name": "Basement", "coordinates": [0.3, 0.1], "type": "room"},
+    {"name": "Garage", "coordinates": [0.2, 0.2], "type": "room"},
+    {"name": "Laundry Room", "coordinates": [0.5, 0.1], "type": "room"},
+    {"name": "Main Entrance", "coordinates": [0.6, 0.2], "type": "entrance"},
+    {"name": "Back Entrance", "coordinates": [0.4, 0.3], "type": "entrance"}
+  ]}
+] }

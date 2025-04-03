@@ -1,0 +1,45 @@
+{
+  "menu": {
+    "title": "Tactical Board",
+    "selectMap": "Select a Map:",
+    "language": "Language"
+  },
+  "map": {
+      "title": "Map: {{mapName}}",
+      "floor": "Floor",
+      "legend": "Legend",
+      "export": "Export Strategy (.json)",
+      "import": "Import Strategy (.json)",
+      "clear": "Clear Canvas",
+      "undo": "Undo (Ctrl+Z)"
+  },
+  "toolbar": {
+      "select": "Select/Move",
+      "tempMarker": "Add Temp Marker",
+      "permMarker": "Add Perm Marker",
+      "operator": "Add Operator",
+      "arrow": "Draw Arrow",
+      "text": "Add Text",
+      "draw": "Free Draw",
+      "erase": "Erase",
+      "color": "Color"
+  },
+  "legendItems": {
+      "attackerSpawn": "Attacker Spawn",
+      "defenderSpawn": "Defender Spawn",
+      "objective": "Objective",
+      "camera": "Camera",
+      "reinforcement": "Reinforcement"
+  },
+  "operators": {
+    "ash": "Ash",
+    "thermite": "Thermite",
+    "kapkan": "Kapkan",
+    "mute": "Mute"
+  },
+  "maps": {
+    "coastline": "Coastline",
+    "bank": "Bank",
+    "consulate": "Consulate"
+  }
+}

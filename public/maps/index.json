@@ -1,0 +1,10 @@
+{
+    "maps": [
+        {
+            "id": "oregon",
+            "nameKey": "maps.oregon",
+            "floors": 5,
+            "menuImage": "r6-maps-oregon.jpg"
+        }
+    ]
+}
