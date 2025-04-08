@@ -4,6 +4,9 @@ import { LegendIconElement } from '../types';
 
 interface LegendIconProps {
   element: LegendIconElement;
+  draggable?: boolean;
+  onDragEnd?: (e: any) => void;
+  id?: string;
 }
 
 const svgStringToImage = (svgString: string | undefined | null, width: number, height: number): Promise<HTMLImageElement> => {
@@ -53,7 +56,7 @@ const svgStringToImage = (svgString: string | undefined | null, width: number, h
   });
 };
 
-const LegendIcon: React.FC<LegendIconProps> = ({ element }) => {
+const LegendIcon: React.FC<LegendIconProps> = ({ element, draggable, onDragEnd, id }) => {
   const [imageElement, setImageElement] = useState<HTMLImageElement | null>(null);
   const [error, setError] = useState<boolean>(false);
 
@@ -100,6 +103,9 @@ const LegendIcon: React.FC<LegendIconProps> = ({ element }) => {
       fill="red" 
       x={element.x}
       y={element.y}
+      draggable={draggable}
+      onDragEnd={onDragEnd}
+      id={id}
     />;
   }
 
@@ -110,6 +116,9 @@ const LegendIcon: React.FC<LegendIconProps> = ({ element }) => {
         fill="gray" 
         x={element.x}
         y={element.y}
+        draggable={draggable}
+        onDragEnd={onDragEnd}
+        id={id}
       />;
     }
 
@@ -118,6 +127,9 @@ const LegendIcon: React.FC<LegendIconProps> = ({ element }) => {
       image={imageElement}
       offsetX={element.width/2}
       offsetY={element.height/2}
+      draggable={draggable}
+      onDragEnd={onDragEnd}
+      id={id}
     />;
   }
 
@@ -129,6 +141,9 @@ const LegendIcon: React.FC<LegendIconProps> = ({ element }) => {
       fontSize={element.height * 0.8}
       offsetX={element.width/2}
       offsetY={element.height/2}
+      draggable={draggable}
+      onDragEnd={onDragEnd}
+      id={id}
     />;
   }
 
@@ -140,7 +155,10 @@ const LegendIcon: React.FC<LegendIconProps> = ({ element }) => {
     fontSize={element.height * 0.8}
     offsetX={element.width/2}
     offsetY={element.height/2}
+    draggable={draggable}
+    onDragEnd={onDragEnd}
+    id={id}
   />;
 };
 
-export default LegendIcon; 
+export default LegendIcon;

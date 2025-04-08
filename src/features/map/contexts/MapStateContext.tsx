@@ -60,6 +60,8 @@ function mapReducer(state: MapState, action: MapAction): MapState {
       return { ...state, selectedColor: action.payload };
     case 'SET_OPERATOR':
          return { ...state, selectedOperator: action.payload };
+    case 'SET_LEGEND_ITEM':
+        return { ...state, selectedLegendItem: action.payload };
     case 'ADD_ELEMENT': {
         // Zapisujemy stan przed zmianą
         const stateWithHistory = saveToHistory(state);
@@ -67,6 +69,7 @@ function mapReducer(state: MapState, action: MapAction): MapState {
         // Dodajemy nowy element do tablicy. Payload jest już typu MapElement.
         // Upewnijmy się, że ID jest unikalne (logika generowania ID może być inna)
         const { floor, element } = action.payload;
+        console.log("Dodawanie elementu:", element);
         const newElementWithId: MapElement = { 
             ...element, 
             id: element.id || Date.now() + Math.random(),
@@ -124,7 +127,7 @@ function mapReducer(state: MapState, action: MapAction): MapState {
             if (el.id === id) {
                 const { type: _type, ...otherUpdates } = updates;
                 void _type;
-                return { ...el, ...otherUpdates };
+                return { ...el, ...otherUpdates } as MapElement;
             }
             return el;
         });

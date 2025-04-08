@@ -28,6 +28,7 @@ const Toolbar: React.FC<ToolbarProps> = ({ currentFloor }) => {
 
   const setLegendItem = useCallback((item: LegendItemConfig | null) => {
     dispatch({ type: 'SET_LEGEND_ITEM', payload: item });
+    console.log('Selected Legend Item:', item);
     setTool('legendIcon');
     setIsLegendSelectorOpen(false);
   }, [dispatch, setTool]);

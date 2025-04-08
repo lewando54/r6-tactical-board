@@ -4,9 +4,11 @@ import Konva from 'konva'; // Importuj Konva dla typów
 import { KonvaEventObject } from 'konva/lib/Node'; // Typ dla eventów Konva
 import useImage from 'use-image';
 import { useMapState, useMapDispatch } from '../contexts/MapStateContext';
-import { MapElement, OperatorElement, AdminMapConfig, CalloutConfig, MapIconConfig, Tool, LegendIconElement } from '../types'; // Importuj typy
+import { MapElement, OperatorElement, AdminMapConfig, CalloutConfig, MapIconConfig, Tool, LegendIconElement, TextElement } from '../types'; // Importuj typy
 import { useTranslation } from 'react-i18next';
 import { legendItems } from '../config/legendConfig';
+// Importuj komponent do renderowania tekstu z emoji
+import TextWithEmoji from './TextWithEmoji';
 
 // Definicja typów propsów dla MapCanvas
 interface MapCanvasProps {
@@ -118,6 +120,9 @@ const OperatorIcon: React.FC<{ element: OperatorElement, commonProps: ComponentP
                 fill="red" 
                 x={element.x}
                 y={element.y}
+                draggable={commonProps.draggable}
+                onDragEnd={commonProps.onDragEnd}
+                id={commonProps.id}
               />;
   }
 
@@ -128,6 +133,9 @@ const OperatorIcon: React.FC<{ element: OperatorElement, commonProps: ComponentP
                 fill="gray" 
                 x={element.x}
                 y={element.y}
+                draggable={commonProps.draggable}
+                onDragEnd={commonProps.onDragEnd}
+                id={commonProps.id}
               />;
   }
 
@@ -146,8 +154,16 @@ const OperatorIcon: React.FC<{ element: OperatorElement, commonProps: ComponentP
           />;
 };
 
-const LegendIcon: React.FC<{ element: LegendIconElement }> = ({ element }) => {
+interface LegendIconProps {
+  element: LegendIconElement;
+  draggable?: boolean;
+  onDragEnd?: (e: KonvaEventObject<DragEvent>) => void;
+  id?: string;
+}
+
+const LegendIcon: React.FC<LegendIconProps> = ({ element, draggable, onDragEnd, id }) => {
   const [imageElement, setImageElement] = useState<HTMLImageElement | null>(null);
+  const [canvasElement, setCanvasElement] = useState<HTMLCanvasElement | null>(null);
   const [error, setError] = useState<boolean>(false);
   const isMountedRef = useRef(true);
 
@@ -179,6 +195,30 @@ const LegendIcon: React.FC<{ element: LegendIconElement }> = ({ element }) => {
       };
   }, [element.svgSource, element.legendId, element.width, element.height]);
 
+  // Użyj useEffect do konwersji tekstu na obraz
+  useEffect(() => {
+    if (!element.symbol) return;
+    
+    import('../utils/textToImage').then(({ textToCanvas }) => {
+      textToCanvas(element.symbol, {
+        fontSize: element.height * 0.8,
+        color: element.color,
+        width: element.width,
+        height: element.height,
+        align: 'center'
+      }).then(canvas => {
+        if (isMountedRef.current) {
+          setCanvasElement(canvas);
+        }
+      }).catch(err => {
+        console.error('Error rendering text to canvas:', err);
+        if (isMountedRef.current) {
+          setError(true);
+        }
+      });
+    });
+  }, [element.symbol, element.color, element.height, element.width]);
+
   const commonProps = {
       x: element.x,
       y: element.y,
@@ -188,6 +228,9 @@ const LegendIcon: React.FC<{ element: LegendIconElement }> = ({ element }) => {
       scaleY: 1,
       align: "center" as const,
       verticalAlign: "middle" as const,
+      draggable: draggable,
+      onDragEnd: onDragEnd,
+      id: id
   };
 
   if (error) {
@@ -196,6 +239,9 @@ const LegendIcon: React.FC<{ element: LegendIconElement }> = ({ element }) => {
                 fill="red" 
                 x={element.x}
                 y={element.y}
+                draggable={draggable}
+                onDragEnd={onDragEnd}
+                id={id}
               />;
   }
 
@@ -216,16 +262,32 @@ const LegendIcon: React.FC<{ element: LegendIconElement }> = ({ element }) => {
                 fill="gray" 
                 x={element.x}
                 y={element.y}
+                draggable={draggable}
+                onDragEnd={onDragEnd}
+                id={id}
               />;
   }
 
-  // Jeśli mamy symbol, renderuj jako tekst
+  // Jeśli mamy symbol, renderuj jako tekst z emoji
   if (element.symbol) {
-      return <KonvaText
-                {...commonProps}
-                text={element.symbol}
-                fill={element.color}
-                fontSize={element.height * 0.8}
+    // Pokaż szare kółko podczas ładowania
+    if (!canvasElement) {
+      return <Circle 
+                radius={element.width / 2} 
+                fill="gray" 
+                x={element.x}
+                y={element.y}
+                draggable={draggable}
+                onDragEnd={onDragEnd}
+                id={id}
+              />;
+    }
+
+    return <KonvaImage
+              {...commonProps}
+              image={canvasElement}
+              offsetX={element.width/2}
+              offsetY={element.height/2}
             />;
   }
 
@@ -235,6 +297,9 @@ const LegendIcon: React.FC<{ element: LegendIconElement }> = ({ element }) => {
             fill="red" 
             x={element.x}
             y={element.y}
+            draggable={draggable}
+            onDragEnd={onDragEnd}
+            id={id}
           />;
 };
 
@@ -316,6 +381,7 @@ const MapCanvas: React.FC<MapCanvasProps> = ({ mapImageUrl, currentFloor, adminC
         if (target === stageRef.current) { // Przesuwanie całej sceny
              dispatch({ type: 'SET_STAGE_STATE', payload: { x: target.x(), y: target.y() } });
         } else { // Przesuwanie konkretnego elementu
+          console.log("Dragging element:", target);
             const id = target.id(); // ID powinno być liczbą zgodnie z typem MapElement
             const elementId = parseInt(id, 10); // Konwertuj ID string na number
 
@@ -383,6 +449,8 @@ const MapCanvas: React.FC<MapCanvasProps> = ({ mapImageUrl, currentFloor, adminC
       if (toolsRequiringDrawStart.includes(currentTool)) {
           setIsDrawing(true);
       }
+
+      console.log(currentTool);
 
      switch (currentTool) {
         case 'tempMarker':
@@ -736,17 +804,11 @@ const MapCanvas: React.FC<MapCanvasProps> = ({ mapImageUrl, currentFloor, adminC
                     scaleY={1}
                   />;
         case 'text':
-          return <KonvaText
+          // Użyj komponentu TextWithEmoji dla elementów tekstowych
+          return <TextWithEmoji
                     key={elementIdStr}
-                    {...specificProps}
-                    x={el.x}
-                    y={el.y}
-                    text={el.text}
-                    fill={el.fill}
-                    scaleX={1}
-                    scaleY={1}
-                    align="center"
-                    verticalAlign="middle"
+                    element={el as TextElement}
+                    commonProps={specificProps}
                  />;
         case 'drawing':
             return <KonvaLine
@@ -765,6 +827,9 @@ const MapCanvas: React.FC<MapCanvasProps> = ({ mapImageUrl, currentFloor, adminC
             return <LegendIcon
                 key={elementIdStr}
                 element={el as LegendIconElement}
+                draggable={isDraggable}
+                onDragEnd={handleDragEnd}
+                id={elementIdStr}
             />;
         default:
              console.warn("Unknown element type:", el);
@@ -900,6 +965,9 @@ const MapCanvas: React.FC<MapCanvasProps> = ({ mapImageUrl, currentFloor, adminC
                         <LegendIcon
                             key={`icon-${index}-${icon.legendId}`}
                             element={element as LegendIconElement}
+                            draggable={currentTool === 'select'}
+                            onDragEnd={handleDragEnd}
+                            id={`admin-icon-${index}-${icon.legendId}`}
                         />
                     );
                 })}
