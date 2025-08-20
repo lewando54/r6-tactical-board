@@ -2,6 +2,8 @@
 
 A tactical planning tool for Rainbow Six Siege teams. This web application provides an interactive map interface for strategic planning, operator placement, and tactical coordination.
 
+https://github.com/user-attachments/assets/0e8264b5-09bd-4a69-998a-dd6223272034
+
 ## Features
 
 - **Interactive Map Interface**: Navigate through different floors of Rainbow Six Siege maps
