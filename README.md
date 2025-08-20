@@ -1,54 +1,112 @@
-# React + TypeScript + Vite
+# R6 Tactical Board
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A tactical planning tool for Rainbow Six Siege teams. This web application provides an interactive map interface for strategic planning, operator placement, and tactical coordination.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Interactive Map Interface**: Navigate through different floors of Rainbow Six Siege maps
+- **Operator Placement**: Place and manage operator positions on tactical maps
+- **Multi-language Support**: Available in English and Polish
+- **Responsive Design**: Works on desktop and mobile devices
+- **Real-time Collaboration**: Share tactical plans with your team
 
-## Expanding the ESLint configuration
+## Supported Maps
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+Currently supported maps include:
+- Oregon
+- Skyscraper
+- More maps coming soon...
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+## Getting Started
+
+### Prerequisites
+
+- Node.js (version 18 or higher)
+- npm or yarn package manager
+
+### Installation
+
+1. Clone the repository:
+```bash
+git clone https://github.com/your-username/r6-tactical-board.git
+cd r6-tactical-board
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
+2. Install dependencies:
+```bash
+npm install
 ```
+
+3. Start the development server:
+```bash
+npm run dev
+```
+
+4. Open your browser and navigate to `http://localhost:5173`
+
+### Building for Production
+
+To create a production build:
+
+```bash
+npm run build
+```
+
+To preview the production build:
+
+```bash
+npm run preview
+```
+
+## Usage
+
+1. **Select a Map**: Choose from the available maps on the main menu
+2. **Navigate Floors**: Use the floor switcher to view different levels of the map
+3. **Place Operators**: Use the operator selector to place team members on the map
+4. **Plan Tactics**: Use the drawing tools to mark strategic positions and routes
+5. **Share Plans**: Export or share your tactical plans with your team
+
+## Technology Stack
+
+- **Frontend**: React 19 with TypeScript
+- **Build Tool**: Vite
+- **Styling**: Tailwind CSS
+- **Graphics**: Konva.js for canvas-based interactions
+- **Internationalization**: i18next
+- **Routing**: React Router DOM
+- **Icons**: React Icons and Twemoji
+
+## Project Structure
+
+```
+src/
+├── components/          # Shared components
+├── features/           # Feature-based modules
+│   └── map/           # Map-related functionality
+│       ├── components/ # Map-specific components
+│       ├── contexts/   # React contexts
+│       ├── hooks/      # Custom hooks
+│       ├── types/      # TypeScript type definitions
+│       └── utils/      # Utility functions
+├── pages/              # Page components
+├── lib/                # Library configurations
+└── i18n.ts            # Internationalization setup
+```
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## License
+
+This project is licensed under the GNU General Public License v3.0 - see the [LICENSE](LICENSE) file for details.
+
+## Acknowledgments
+
+- Rainbow Six Siege community for inspiration
+- Ubisoft for the Rainbow Six Siege franchise
+- All contributors and supporters of this project
