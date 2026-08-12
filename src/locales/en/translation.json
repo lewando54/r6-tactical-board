@@ -1,0 +1,84 @@
+{
+  "menu": {
+    "title": "Tactical Board",
+    "selectMap": "Select a Map:",
+    "language": "Language"
+  },
+  "map": {
+    "title": "Map: {{mapName}}",
+    "roof": "Roof",
+    "floor": "Floor",
+    "nthFloor": "{{floorNumber}} floor",
+    "basement": "Basement",
+    "ground": "Ground floor",
+    "legend": "Legend",
+    "export": "Export Strategy (.json)",
+    "import": "Import Strategy (.json)",
+    "clear": "Clear Canvas",
+    "undo": "Undo (Ctrl+Z)",
+    "importError": "The strategy file could not be imported.",
+    "enterText": "Enter text",
+    "clearFloor": "Current floor",
+    "clearAll": "All floors"
+  },
+  "toolbar": {
+    "select": "Select/Move",
+    "permMarker": "Add Perm Marker",
+    "operator": "Add Operator",
+    "arrow": "Draw Arrow",
+    "text": "Add Text",
+    "draw": "Free Draw",
+    "erase": "Erase",
+    "color": "Color",
+    "selectOperator": "Select Operator",
+    "selectLegendItem": "Select legend icon",
+    "legendIcon": "Legend icon"
+  },
+  "legend": {
+    "open": "Open Legend",
+    "close": "Close Legend"
+  },
+  "legendItems": {
+    "attackerSpawn": "Attacker Spawn",
+    "defenderSpawn": "Defender Spawn",
+    "objective": "Objective",
+    "camera": "Camera",
+    "reinforcement": "Reinforcement",
+    "hatchCeiling": "Ceiling hatch",
+    "hatchFloor": "Floor hatch",
+    "softWall": "Soft wall",
+    "breach": "Breach",
+    "droneHole": "Drone hole",
+    "lineOfSight": "Line of sight"
+  },
+  "operators": {
+    "role": {
+      "attacker": "Attackers",
+      "defender": "Defenders"
+    }
+  },
+  "maps": {
+    "oregon": "Oregon",
+    "skyscraper": "Skyscraper"
+  },
+  "mapCallouts": {
+    "oregon": {
+      "kitchen": "Kitchen",
+      "diningRoom": "Dining Room",
+      "basementEntry": "Basement entrance",
+      "stairs": "Stairs"
+    }
+  },
+  "common": {
+    "cancel": "Cancel",
+    "close": "Close",
+    "loading": "Loading map data...",
+    "goBack": "Go back to menu",
+    "confirm": "Confirm"
+  },
+  "errors": {
+    "mapIdMissing": "Map ID is missing in the URL",
+    "mapNotFound": "Map not found: {{mapId}}",
+    "mapLoadError": "Error loading map: {{error}}"
+  }
+}

@@ -1,6 +1,7 @@
 {
   "floors": [
     {
+      "floorNumber": -1,
       "callouts": [
         {
           "nameKey": "basementEntry",

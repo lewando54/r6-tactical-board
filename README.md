@@ -1,114 +1,107 @@
 # R6 Tactical Board
 
-A tactical planning tool for Rainbow Six Siege teams. This web application provides an interactive map interface for strategic planning, operator placement, and tactical coordination.
-
-https://github.com/user-attachments/assets/0e8264b5-09bd-4a69-998a-dd6223272034
+A tactical planning tool for Rainbow Six Siege. Place operators, draw routes, and mark utility on multi-floor map blueprints. Plans can be exported and imported as JSON.
 
 ## Features
 
-- **Interactive Map Interface**: Navigate through different floors of Rainbow Six Siege maps
-- **Operator Placement**: Place and manage operator positions on tactical maps
-- **Multi-language Support**: Available in English and Polish
-- **Responsive Design**: Works on desktop and mobile devices
-- **Real-time Collaboration**: Share tactical plans with your team
+- Interactive Konva canvas with pan and zoom
+- Operator placement from the `r6operators` catalog
+- Drawing tools: marker, arrow, freehand, eraser, text, legend icons
+- Multi-floor maps with optional admin callouts
+- English and Polish UI
+- Strategy export/import (JSON)
 
-## Supported Maps
+## Supported maps
 
-Currently supported maps include:
+Maps are listed in `public/maps/index.json`. Currently:
+
 - Oregon
 - Skyscraper
-- More maps coming soon...
 
-## Getting Started
+Blueprint and menu images live under `public/maps/{mapId}/` and are referenced by filename in the index (and per-floor `image` fields). Optional overlays go in `public/maps/{mapId}/config.json`.
+
+## Getting started
 
 ### Prerequisites
 
-- Node.js (version 18 or higher)
-- npm or yarn package manager
+- Node.js 18 or higher
+- npm
 
 ### Installation
 
-1. Clone the repository:
 ```bash
 git clone https://github.com/your-username/r6-tactical-board.git
 cd r6-tactical-board
-```
-
-2. Install dependencies:
-```bash
 npm install
-```
-
-3. Start the development server:
-```bash
 npm run dev
 ```
 
-4. Open your browser and navigate to `http://localhost:5173`
+Open `http://localhost:5173`.
 
-### Building for Production
+### Scripts
 
-To create a production build:
+| Script | Description |
+|--------|-------------|
+| `npm run dev` | Vite dev server |
+| `npm run build` | Typecheck and production build |
+| `npm run preview` | Preview the production build |
+| `npm run lint` | ESLint |
+| `npm test` | Vitest |
 
-```bash
-npm run build
-```
-
-To preview the production build:
-
-```bash
-npm run preview
-```
+GitHub Pages builds set `VITE_BASE=/r6-tactical-board/`.
 
 ## Usage
 
-1. **Select a Map**: Choose from the available maps on the main menu
-2. **Navigate Floors**: Use the floor switcher to view different levels of the map
-3. **Place Operators**: Use the operator selector to place team members on the map
-4. **Plan Tactics**: Use the drawing tools to mark strategic positions and routes
-5. **Share Plans**: Export or share your tactical plans with your team
+1. Choose a map on the menu
+2. Switch floors with the floor panel
+3. Place operators and draw tactics with the toolbar
+4. Export a strategy JSON to share; import it later on the same map
 
-## Technology Stack
+## Map index shape
 
-- **Frontend**: React 19 with TypeScript
-- **Build Tool**: Vite
-- **Styling**: Tailwind CSS
-- **Graphics**: Konva.js for canvas-based interactions
-- **Internationalization**: i18next
-- **Routing**: React Router DOM
-- **Icons**: React Icons and Twemoji
+```json
+{
+  "maps": [
+    {
+      "id": "oregon",
+      "nameKey": "maps.oregon",
+      "menuImage": "r6-maps-oregon.jpg",
+      "floors": [
+        {
+          "nameKey": "map.basement",
+          "floorNumber": -1,
+          "image": "r6-maps-oregon-blueprint-1.jpg"
+        }
+      ]
+    }
+  ]
+}
+```
 
-## Project Structure
+## Technology stack
+
+- React 19 and TypeScript
+- Vite
+- Tailwind CSS
+- Konva / react-konva
+- i18next
+- React Router
+- Zod (runtime validation for map and strategy JSON)
+- r6operators (operator icons and names)
+
+## Project structure
 
 ```
 src/
-├── components/          # Shared components
-├── features/           # Feature-based modules
-│   └── map/           # Map-related functionality
-│       ├── components/ # Map-specific components
-│       ├── contexts/   # React contexts
-│       ├── hooks/      # Custom hooks
-│       ├── types/      # TypeScript type definitions
-│       └── utils/      # Utility functions
-├── pages/              # Page components
-├── lib/                # Library configurations
-└── i18n.ts            # Internationalization setup
+├── components/          # Shared UI (Modal, LanguageSwitcher)
+├── features/map/        # Canvas, tools, state, schemas
+├── lib/                 # Map loading and operator catalog
+├── locales/             # EN/PL translations
+├── pages/               # Menu and map routes
+└── i18n.ts
+public/maps/             # Map registry, blueprints, admin overlays
 ```
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
 
 ## License
 
-This project is licensed under the GNU General Public License v3.0 - see the [LICENSE](LICENSE) file for details.
-
-## Acknowledgments
-
-- Rainbow Six Siege community for inspiration
-- Ubisoft for the Rainbow Six Siege franchise
-- All contributors and supporters of this project
+GNU General Public License v3.0 — see [LICENSE](LICENSE).

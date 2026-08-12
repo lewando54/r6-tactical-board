@@ -15,36 +15,49 @@
     "export": "Eksportuj strategię (.json)",
     "import": "Importuj strategię (.json)",
     "clear": "Wyczyść płótno",
-    "undo": "Cofnij (Ctrl+Z)"
+    "undo": "Cofnij (Ctrl+Z)",
+    "importError": "Nie udało się zaimportować pliku strategii.",
+    "enterText": "Wpisz tekst",
+    "clearFloor": "Aktualne piętro",
+    "clearAll": "Wszystkie piętra"
   },
   "toolbar": {
     "select": "Wybierz/Przesuń",
-    "tempMarker": "Dodaj tymczasowy znacznik",
     "permMarker": "Dodaj stały znacznik",
     "operator": "Dodaj operatora",
     "arrow": "Narysuj strzałkę",
     "text": "Dodaj tekst",
     "draw": "Rysuj swobodnie",
     "erase": "Wymaż",
-    "color": "Kolor"
+    "color": "Kolor",
+    "selectOperator": "Wybierz operatora",
+    "selectLegendItem": "Wybierz ikonę z legendy",
+    "legendIcon": "Ikona legendy"
+  },
+  "legend": {
+    "open": "Otwórz legendę",
+    "close": "Zamknij legendę"
   },
   "legendItems": {
     "attackerSpawn": "Miejsce pojawienia się atakujących",
     "defenderSpawn": "Miejsce pojawienia się obrońców",
     "objective": "Cel",
     "camera": "Kamera",
-    "reinforcement": "Wsparcie"
+    "reinforcement": "Wsparcie",
+    "hatchCeiling": "Właz sufitowy",
+    "hatchFloor": "Właz podłogowy",
+    "softWall": "Miękka ściana",
+    "breach": "Przebicie",
+    "droneHole": "Otwór na drona",
+    "lineOfSight": "Linia wzroku"
   },
   "operators": {
-    "ash": "Ash",
-    "thermite": "Thermite",
-    "kapkan": "Kapkan",
-    "mute": "Mute"
+    "role": {
+      "attacker": "Atakujący",
+      "defender": "Obrońcy"
+    }
   },
   "maps": {
-    "coastline": "Wybrzeże",
-    "bank": "Bank",
-    "consulate": "Konsulat",
     "oregon": "Oregon",
     "skyscraper": "Wieżowiec"
   },
@@ -57,6 +70,15 @@
     }
   },
   "common": {
-    "cancel": "Anuluj"
+    "cancel": "Anuluj",
+    "close": "Zamknij",
+    "loading": "Ładowanie danych mapy...",
+    "goBack": "Wróć do menu",
+    "confirm": "Potwierdź"
+  },
+  "errors": {
+    "mapIdMissing": "Brak identyfikatora mapy w adresie URL",
+    "mapNotFound": "Nie znaleziono mapy: {{mapId}}",
+    "mapLoadError": "Błąd ładowania mapy: {{error}}"
   }
 }
